@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Retetele Noastre{% endblock %}
+
+{% block content %}
+    <h1>Aici se gasesc retetele adunate de noi:</h1>
+
+  <form method="get" action="{% url 'cautare_retete' %}">
+    <input type="text" name="q" value="{{ request.GET.q }}">
+
+    <form method="get">
+    <select name="categorie">
+        <option value="">Toate</option>
+        <option value="MD">Mic dejun</option>
+        <option value="PR">Prăjituri</option>
+        <option value="TO">Torturi</option>
+        <option value="SU">Supe</option>
+        <option value="GA">Garnituri</option>
+        <option value="CA">Carne</option>
+        <option value="PE">Pește</option>
+    </select>
+
+    <button type="submit">Filtrează</button>
+      <a href="{% url 'cautare_retete' %}">🔄</a>
+</form>
+<span class="badge">
+   {{ retete.get_categorie_display }}
+</span>
+    <button type="submit">🔍</button>
+
+    {% if request.GET.q %}
+        <a href="{% url 'retete' %}" style="margin-left:10px;">✖</a>
+    {% endif %}
+</form>
+
+  <form method="get" action="">
+    <label>Sortare:</label>
+    <select name="sort" onchange="this.form.submit()">
+        <option value="-data_creare">Cele mai noi</option>
+        <option value="data_creare">Cele mai vechi</option>
+        <option value="alfabetic">A-Z</option>
+        <option value="-alfabetic">Z-A</option>
+    </select>
+</form>
+
+    <ul>
+      {% for retete in page_obj  %}
+      <li>
+        <details>
+          <summary class = "nume_reteta">
+            <span>{{ retete.nume }}</span>
+            {% if retete.poza %}
+            <br><img src="{{ retete.poza.url }}" width="70">
+            {% endif %}
+            <a href="{% if retete.user %}{% url 'retetele_prietenilor' retete.user.id %}{% endif %}">
+            {{ retete.user|default:"Anonim" }}
+            </a>
+          </summary>
+
+          <div>
+            <strong>Ingrediente:</strong>
+            <p>{{ retete.ingrediente }}</p>
+            <strong>Preparare:</strong>
+            <p>{{ retete.preparare }}</p>
+            <strong>Timp pregătire: </strong>
+            <p>{{ retete.timp_pregatire }}</p>
+            <strong>Timp gătire: </strong>
+            <p> {{ retete.timp_gatire }}</p>
+            <strong>Data creare: </strong>
+            <p> {{ retete.data_creare }}</p>
+          </div>
+            <a href="{% url 'stergere_reteta' retete.id %}">🗑️</a>
+            <a href="{% url 'modificare_reteta' retete.id %}">✍️</a>
+
+          <h4>Comentarii</h4>
+
+{% for c in retete.comments.all %}
+    <p><b>{{ c.user }}</b>: {{ c.text }}</p>
+{% empty %}
+    <p>Fără comentarii încă</p>
+{% endfor %}
+
+<form method="post" action="{% url 'adauga_comment' retete.id %}">
+    {% csrf_token %}
+    <input type="text" name="text">
+    <button type="submit">Trimite</button>
+</form>
+
+          <form method="post" action="{% url 'adauga_like' retete.id %}?page={{ page_obj.number }}">
+    {% csrf_token %}
+    <button type="submit">
+        ❤️ {{ retete.likes.count }}
+    </button>
+</form>
+
+          <form method="post" action="{% url 'adauga_poza' retete.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="poza">
+            <button type="submit">Adaugă poza</button>
+          </form>
+
+          {% if retete.poza %}
+            <img src="{{ retete.poza.url }}" width="70">
+          <form method="post" action="{% url 'sterge_poza' retete.id %}">
+            {% csrf_token %}
+            <button type="submit">Sterge Poza </button>
+          </form>
+          {% endif %}
+
+          </details>
+      </li>
+        {% empty %}
+        <li>Nu au fost gasite retete.</li>
+
+
+      {% endfor %}
+    </ul>
+
+    <div>
+        {% if page_obj.has_previous %}
+        <a href="?page=1">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&categorie={{ request.GET.categorie }}">Previous</a>
+        {% endif %}
+    <span>
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&categorie={{ request.GET.categorie }}">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Inregistreaza-te aici{% endblock %}
+
+{% block content %}
+
+   <h1>Inregistrare</h1>
+
+    {% if form.errors %}
+    <div>
+      <p>Au aparut erori la inregistrare:</p>`
+        <ul class="alert">
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button>
+    </form>
+
+    <p>Ai deja un cont?
+   <a href="{% url 'login' %}">Login</a>
+    </p>
+
+{% endblock %}

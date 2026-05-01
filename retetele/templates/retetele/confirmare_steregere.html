@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Stergere Reteta{% endblock %}
+
+{% block content %}
+
+   <h1>Stergere Reteta</h1>
+    <p>Esti sigur ca doresti sa stergi delicioasa reteta pentru "{{ retete.nume}}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Da</button>
+        <a href="{% url 'retete' %}">Nu</a>
+    </form>
+
+
+{% endblock %}
+

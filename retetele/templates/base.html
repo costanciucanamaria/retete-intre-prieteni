@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} {% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@intergrav/dev.css@4"/>
+    <link rel="stylesheet" href="/static/main.css"/>
+</head>
+
+<body>
+  <nav class = "navigation_bar">
+
+    <div>
+      <a href="{% url 'retete' %}">Home</a>
+      <a href="{% url 'introducere_reteta' %}">Adauga o reteta noua</a>
+    </div>
+
+    <div>
+      {% if user.is_authenticated %}
+      <div>
+        <span>Salut {{ user.username }}</span>
+        <a href="{% url 'logout' %}">Logout</a>
+      </div>
+      {% else %}
+      <div>
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'register' %}">Register</a>
+      </div>
+      {% endif %}
+    </div>
+
+  </nav>
+
+  <main>
+    {% block content %} {% endblock %}
+  </main>
+</body>
+
+</html>
